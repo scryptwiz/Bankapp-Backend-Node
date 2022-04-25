@@ -91,23 +91,31 @@ app.post('/signup', (req,res) =>{
 app.post('/signin', (req,res)=>{
     let loginContent = req.body;
     userModel.findOne({email:loginContent.email}, async (err,result)=>{
-        // let users = result;
-        // let found = users.find((element, i) => element.email == loginContent.email)
-        if (result) {
+        if (err) {
+            console.log(err);
+            res.json({message: 'Network Error', status: false, err})
+        } else if (result) {
             console.log(result);
             let email = result.email
+            console.log(email);
             let validPassword = await bcrypt.compare(loginContent.password, result.password)
             if(validPassword){
-                jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: '1h', issuer: "localhost:3000"}, (err, token)=>{
-                console.log(token);
-                res.json({message:"Login Succesfully" ,token, status: true})
+                jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: "2m", issuer: "localhost:3000"}, (err, token)=>{
+                    if(err){
+                        {err.message=="jwt expired"? res.json({message: "Session timed out, kindly login again", status: false}) : null;}
+                        console.log(err);
+                    }else {
+                        console.log(token);
+                        res.json({message:"Login Succesfully" ,token, status: true})
+                    }
+               
             })
             } else {
                 res.json({message: "Incorrect Password", status: false})
             }
-        }  else {
+        }  else if (result==null) {
             res.json({message: "Email not registered", success:false})
-        }
+        } 
     })
 })
 
@@ -116,10 +124,12 @@ app.get('/loadDashboard', (req,res)=>{
     let token = req.headers.authorization.split(' ')[1]
     jwt.verify(token, process.env.JWT_SECRET,(err, decoded)=>{
         if(err){
+            res.send({status:false})
             console.log('Token no gree verify');
             console.log(err);
         } else {
             if (decoded) {
+                res.send({status:true})
                 console.log(decoded);
             }
         }
