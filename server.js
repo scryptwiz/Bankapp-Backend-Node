@@ -29,7 +29,6 @@ let userSchema = mongoose.Schema({
     },
     phone_number: {
         type: String,
-        default: '',
         unique: true
     },
     password: {
@@ -38,7 +37,6 @@ let userSchema = mongoose.Schema({
     },
     gender: {
         type: String,
-        default: ''
     },
     email: {
         type: String,
@@ -52,7 +50,6 @@ let userSchema = mongoose.Schema({
     },
     bvn: {
         type: String,
-        default: '',
         unique: true
     },
     verified_acc: {
@@ -75,14 +72,14 @@ app.post('/signup', (req,res) =>{
     let signup = new userModel({ firstname, lastname, email, password, accountNo, })
     signup.save((err) => {
         if (!err) {
-            res.json({message: "Signed up successfully"})
+            res.json({message: "Signed up successfully", status: true})
         } else if (err) {
             if (err.keyPattern.email == 1) {
-                res.json({message: "Email already existed"})
+                res.json({message: "Email already existed", status: false})
             } else if (err.keyPattern.accountNo == 1) {
                 accountNo = Math.floor(10000000000 + Math.random() * 90000000000)
             } else {
-                res.json({message: err})
+                res.json({message: err, status: false})
             }
         }
     })
@@ -100,7 +97,7 @@ app.post('/signin', (req,res)=>{
             console.log(email);
             let validPassword = await bcrypt.compare(loginContent.password, result.password)
             if(validPassword){
-                jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: "2m", issuer: "localhost:3000"}, (err, token)=>{
+                jwt.sign({email}, process.env.JWT_SECRET, {expiresIn: "2h", issuer: "localhost:3000"}, (err, token)=>{
                     if(err){
                         {err.message=="jwt expired"? res.json({message: "Session timed out, kindly login again", status: false}) : null;}
                         console.log(err);
