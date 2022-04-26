@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const PORT = process.env.PORT || 4500;
 const cors = require('cors');
 const mongoose = require('mongoose')
+const usersModel = require('./Models/dbSchema')
 app.use(cors())
 
 app.use(bodyParser.urlencoded({extended:true}))
@@ -16,60 +17,81 @@ const URI = process.env.MONGOS_URI
 mongoose.connect(URI, (err)=> {
     {!err ? console.log("Connected Successfully") : console.log(err);}
 })
-
 mongoose.Promise = global.Promise;
-let userSchema = mongoose.Schema({
-    firstname:{
-        type: String,
-        require:true
-    },
-    lastname:{
-        type: String,
-        require:true
-    },
-    phone_number: {
-        type: String,
-        unique: true
-    },
-    password: {
-        type: String,
-        require:true
-    },
-    gender: {
-        type: String,
-    },
-    email: {
-        type: String,
-        require: true,
-        unique: true
-    },
-    account_no: {
-        type: String,
-        require:true,
-        unique: true
-    },
-    bvn: {
-        type: String,
-        unique: true
-    },
-    verified_acc: {
-        type: Boolean,
-        require: true,
-        default: false
-    }
-})
-userSchema.pre('save', async function (next){
-    let {password} =this;
-    const saltRound = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(password, saltRound);
-    next();
-})
-let userModel = mongoose.model("users_db", userSchema);
+
+// mongoose.connect(URI, { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then((result) => console.log("Connect To DB Successfully"))
+//     .catch((err) => console.log(err))
+
+// let userSchema = mongoose.Schema({
+//     firstname:{
+//         type: String,
+//         require:true
+//     },
+//     lastname:{
+//         type: String,
+//         require:true
+//     },
+//     phone_number: {
+//         type: String,
+//         unique: true
+//     },
+//     password: {
+//         type: String,
+//         require:true
+//     },
+//     gender: {
+//         type: String,
+//     },
+//     email: {
+//         type: String,
+//         require: true,
+//         unique: true
+//     },
+//     account_no: {
+//         type: String,
+//         require:true,
+//         unique: true
+//     },
+//     bvn: {
+//         type: String,
+//         unique: true
+//     },
+//     verified_acc: {
+//         type: Boolean,
+//         require: true,
+//         default: false
+//     }
+// })
+// userSchema.pre('save', async function (next){
+//     let {password} =this;
+//     const saltRound = await bcrypt.genSalt(10);
+//     this.password = await bcrypt.hash(password, saltRound);
+//     next();
+// })
+// let userModel = mongoose.model("users_db", userSchema);
+
+// app.get('/test', (req,res)=>{
+//     const users = new usersModel({
+//         firstname: 'Kelvin',
+//         lastname: 'Ajayi',
+//         email: 'kelvin@gmail.com',
+//         password: 'Kelvin@002',
+//         accountNo: '0000000000'
+//     })
+//     users.save()
+//         .then((result)=>{
+//             res.send(result)
+//         })
+//         .catch((err)=>{
+//             res.send(err)
+//         })
+// })
 
 app.post('/signup', (req,res) =>{
     let {firstname, lastname, email, password} = req.body 
     const accountNo = Math.floor(10000000000 + Math.random() * 90000000000)
-    let signup = new userModel({ firstname, lastname, email, password, accountNo, })
+    const signup = new usersModel({ firstname, lastname, email, password, accountNo })
     signup.save((err) => {
         if (!err) {
             res.json({message: "Signed up successfully", status: true})
@@ -87,7 +109,7 @@ app.post('/signup', (req,res) =>{
 
 app.post('/signin', (req,res)=>{
     let loginContent = req.body;
-    userModel.findOne({email:loginContent.email}, async (err,result)=>{
+    usersModel.findOne({email:loginContent.email}, async (err,result)=>{
         if (err) {
             console.log(err);
             res.json({message: 'Network Error', status: false, err})
