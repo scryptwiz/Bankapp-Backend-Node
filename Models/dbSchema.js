@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 
 const usersSchema = new Schema({
@@ -42,12 +43,12 @@ const usersSchema = new Schema({
     }
 }, { timestamps: true });
 
-// usersSchema.pre('save', async function (next){
-//     let {password} =this;
-//     const saltRound = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(password, saltRound);
-//     next();
-// })
+usersSchema.pre('save', async function (next){
+    let {password} =this;
+    const saltRound = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(password, saltRound);
+    next();
+})
 
 const usersModel = mongoose.model("User", usersSchema)
 
