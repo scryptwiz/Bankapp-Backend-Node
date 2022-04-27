@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 const usersModel = require('../Models/dbSchema')
 
 const signin = (req,res) =>{

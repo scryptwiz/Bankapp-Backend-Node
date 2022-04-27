@@ -7,6 +7,6 @@ const dashboardController = require('../Controllers/dashboardController')
 
 router.post('/signup', signupController.signup)
 router.post('/signin', signinController.signin)
-router.post('/loadDashboard', dashboardController.loadDashboard)
+router.get('/loadDashboard', dashboardController.loadDashboard)
  
 module.exports = router;

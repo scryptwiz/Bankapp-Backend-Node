@@ -1,4 +1,4 @@
-const usersModel = require('../Models/dbSchema')
+const jwt = require('jsonwebtoken')
 
 const loadDashboard = (req,res) => {
     console.log(req.headers.authorization);

@@ -17,7 +17,6 @@ const usersSchema = new Schema({
     },
     password: {
         type: String,
-        require:true
     },
     gender: {
         type: String,
@@ -34,7 +33,6 @@ const usersSchema = new Schema({
     },
     bvn: {
         type: String,
-        unique: true
     },
     verified_acc: {
         type: Boolean,
